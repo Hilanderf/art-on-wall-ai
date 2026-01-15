@@ -323,12 +323,12 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-black via-gray-900 to-red-950">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-purple-100 sticky top-0 z-10">
+      <div className="bg-black/80 backdrop-blur-sm border-b border-red-900 sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-6 py-4">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent text-center">
-            Mockup Manon Noleemeet
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent text-center">
+            Mockup Benoit Noleemeet
           </h1>
         </div>
       </div>
@@ -344,7 +344,7 @@ const App: React.FC = () => {
               {/* Étape 1: Upload */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-sm">1</div>
                   <h3 className="text-xl font-semibold text-gray-800">Votre création</h3>
                 </div>
                 <ImageUploader onImageChange={handleImageChange} preview={preview} />
@@ -357,19 +357,19 @@ const App: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-800">Style & Finition</h3>
                 </div>
 
-                <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                   <h4 className="font-medium text-gray-700 mb-4">Type d'œuvre</h4>
                   <ArtworkTypeSelector selectedArtworkType={artworkType} onArtworkTypeChange={setArtworkType} />
                 </div>
 
                 {artworkType === ArtworkType.Painting && (
                   <>
-                    <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                    <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                       <h4 className="font-medium text-gray-700 mb-4">Encadrement</h4>
                       <FrameSelector selectedFrame={frameType} onFrameChange={setFrameType} />
                     </div>
 
-                    <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                    <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                       <h4 className="font-medium text-gray-700 mb-4">Couleur du mur</h4>
                       <WallSelector selectedWall={wallType} onWallChange={setWallType} />
                     </div>
@@ -378,12 +378,12 @@ const App: React.FC = () => {
 
                 {artworkType === ArtworkType.Statue && (
                   <>
-                    <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                    <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                       <h4 className="font-medium text-gray-700 mb-4">Couleur de la pièce</h4>
                       <RoomSelector selectedRoom={roomType} onRoomChange={setRoomType} />
                     </div>
 
-                    <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                    <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                       <h4 className="font-medium text-gray-700 mb-4">Couleur du socle</h4>
                       <PedestalSelector selectedPedestal={pedestalType} onPedestalChange={setPedestalType} />
                     </div>
@@ -398,23 +398,23 @@ const App: React.FC = () => {
                   <h3 className="text-xl font-semibold text-gray-800">Génération</h3>
                 </div>
 
-                <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                   <h4 className="font-medium text-gray-700 mb-4">Modèle IA</h4>
                   <ModelSelector selectedModel={modelType} onModelChange={setModelType} />
                 </div>
 
                 {modelType !== ModelType.GptImage15 && (
-                  <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                  <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                     <h4 className="font-medium text-gray-700 mb-4">Format de l'image</h4>
                     <AspectRatioSelector selectedRatio={aspectRatio} onRatioChange={setAspectRatio} />
                   </div>
                 )}
 
-                <div className="bg-white/60 rounded-2xl p-6 border border-purple-100">
+                <div className="bg-white/60 rounded-2xl p-6 border border-red-900">
                   <button
                     onClick={handleGenerateClick}
                     disabled={!isFormComplete || isLoading}
-                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-2xl hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-4 focus:ring-purple-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
+                    className="w-full bg-gradient-to-r from-red-600 to-red-700 text-white font-semibold py-4 px-6 rounded-2xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-4 focus:ring-red-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] shadow-lg"
                   >
                     {isLoading ? (
                       <div className="flex items-center justify-center space-x-2">
