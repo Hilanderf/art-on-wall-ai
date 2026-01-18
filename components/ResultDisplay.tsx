@@ -35,7 +35,7 @@ const LoadingSpinner: React.FC<{ message?: string; subMessage?: string }> = ({
   subMessage = "L'IA est en train de creer votre chef-d'oeuvre. Cela peut prendre un moment."
 }) => (
     <div className="flex flex-col items-center justify-center text-center">
-      <svg className="animate-spin -ml-1 mr-3 h-12 w-12 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <svg className="animate-spin -ml-1 mr-3 h-12 w-12 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
@@ -227,7 +227,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className="text-center">
-            <p className="font-semibold text-indigo-700 mb-2">First Frame (Face)</p>
+            <p className="font-semibold text-red-700 mb-2">First Frame (Face)</p>
             <img
               src={imageUrl}
               alt="Mockup face"
@@ -235,7 +235,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             />
           </div>
           <div className="text-center">
-            <p className="font-semibold text-purple-700 mb-2">Last Frame (Dos) - Generee</p>
+            <p className="font-semibold text-gray-500 mb-2">Last Frame (Dos) - Generee</p>
             <img
               src={lastFrameUrl}
               alt="Last frame generee"
@@ -255,7 +255,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
           <button
             type="button"
             onClick={onConfirmLastFrame}
-            className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-colors"
+            className="bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-lg hover:from-red-700 hover:to-red-800 transition-colors"
           >
             Generer la video
           </button>
@@ -306,7 +306,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
             <button
               type="button"
               onClick={handleVideoDownload}
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors"
+              className="bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
             >
               Telecharger la video
             </button>
@@ -314,7 +314,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
               <button
                 type="button"
                 onClick={onBackToImage}
-                className="bg-blue-100 text-blue-800 font-bold py-3 px-6 rounded-lg hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 transition-colors flex items-center space-x-2"
+                className="bg-gray-200 text-gray-800 font-bold py-3 px-6 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-colors flex items-center space-x-2"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -365,7 +365,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <button
                     type="button"
                     onClick={handleDownload}
-                    className="bg-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                    className="bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
                 >
                     Telecharger
                 </button>
@@ -374,7 +374,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   <button
                     type="button"
                     onClick={() => setShowAnimationPanel(!showAnimationPanel)}
-                    className="bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-lg hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors flex items-center space-x-2"
+                    className="bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-lg hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors flex items-center space-x-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -388,7 +388,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   <button
                     type="button"
                     onClick={onAnimatePaintingClick}
-                    className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-6 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors flex items-center space-x-2"
+                    className="bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center space-x-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -422,11 +422,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
 
             {/* Animation Panel for Statues */}
             {isStatue && showAnimationPanel && (
-              <div className="w-full max-w-md bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl p-6 border border-purple-200 mt-4">
-                <h3 className="text-lg font-semibold text-purple-800 mb-4 text-center">
+              <div className="w-full max-w-md bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-6 border border-gray-300 mt-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
                   Animer votre sculpture
                 </h3>
-                <p className="text-sm text-purple-600 mb-4 text-center">
+                <p className="text-sm text-gray-600 mb-4 text-center">
                   Uploadez une photo du dos de votre sculpture pour creer une animation de rotation.
                 </p>
 
@@ -439,7 +439,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   type="button"
                   onClick={handleStartAnimation}
                   disabled={!backImageFile}
-                  className="w-full mt-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white font-bold py-3 px-6 rounded-xl hover:from-purple-700 hover:to-pink-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full mt-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Generer la last frame
                 </button>

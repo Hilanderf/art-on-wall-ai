@@ -21,14 +21,14 @@ const RoomSelector: React.FC<RoomSelectorProps> = ({ selectedRoom, onRoomChange 
           onClick={() => onRoomChange(option.type)}
           className={`p-4 rounded-xl border-2 transition-all duration-200 ${
             selectedRoom === option.type
-              ? 'border-purple-500 bg-purple-50 shadow-md'
-              : `${option.border} hover:border-purple-300 hover:shadow-sm`
+              ? 'border-red-600 bg-gray-100 shadow-md'
+              : `${option.border} hover:border-red-400 hover:shadow-sm`
           }`}
         >
           <div className="flex flex-col items-center space-y-2">
             <div className={`w-12 h-8 ${option.color} rounded-lg border ${option.border} shadow-sm`}></div>
             <span className={`text-sm font-medium ${
-              selectedRoom === option.type ? 'text-purple-700' : 'text-gray-700'
+              selectedRoom === option.type ? 'text-red-700' : 'text-gray-700'
             }`}>
               {option.label}
             </span>

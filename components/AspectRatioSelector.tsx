@@ -16,11 +16,11 @@ const RatioOption: React.FC<{
   <div
     onClick={() => onRatioChange(value)}
     className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-      selectedRatio === value ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300 bg-white'
+      selectedRatio === value ? 'border-red-600 bg-gray-100' : 'border-gray-300 bg-white'
     }`}
   >
-    <div className={`w-6 h-6 rounded-full border-2 ${selectedRatio === value ? 'border-indigo-500' : 'border-gray-400'} flex items-center justify-center mr-4`}>
-      {selectedRatio === value && <div className="w-3 h-3 bg-indigo-600 rounded-full"></div>}
+    <div className={`w-6 h-6 rounded-full border-2 ${selectedRatio === value ? 'border-red-600' : 'border-gray-400'} flex items-center justify-center mr-4`}>
+      {selectedRatio === value && <div className="w-3 h-3 bg-red-600 rounded-full"></div>}
     </div>
     <div className="flex items-center gap-3">
       {icon}

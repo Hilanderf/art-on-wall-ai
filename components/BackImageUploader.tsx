@@ -7,7 +7,7 @@ interface BackImageUploaderProps {
 
 const UploadIcon: React.FC = () => (
   <svg
-    className="w-8 h-8 mb-2 text-purple-400"
+    className="w-8 h-8 mb-2 text-red-500"
     fill="none"
     stroke="currentColor"
     viewBox="0 0 24 24"
@@ -59,7 +59,7 @@ const BackImageUploader: React.FC<BackImageUploaderProps> = ({ onImageChange, pr
         htmlFor="back-image-file"
         onDrop={handleDrop}
         onDragOver={handleDragOver}
-        className="flex flex-col items-center justify-center w-full h-48 border-2 border-purple-300 border-dashed rounded-xl cursor-pointer bg-purple-50 hover:bg-purple-100 transition-colors"
+        className="flex flex-col items-center justify-center w-full h-48 border-2 border-red-400 border-dashed rounded-xl cursor-pointer bg-gray-100 hover:bg-gray-200 transition-colors"
       >
         {preview ? (
           <img
@@ -70,10 +70,10 @@ const BackImageUploader: React.FC<BackImageUploaderProps> = ({ onImageChange, pr
         ) : (
           <div className="flex flex-col items-center justify-center p-4 text-center">
             <UploadIcon />
-            <p className="mb-1 text-sm text-purple-600 font-medium">
+            <p className="mb-1 text-sm text-red-600 font-medium">
               Photo du dos de la sculpture
             </p>
-            <p className="text-xs text-purple-500">
+            <p className="text-xs text-gray-500">
               Cliquez ou glissez-deposez
             </p>
           </div>
