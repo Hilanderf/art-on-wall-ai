@@ -353,7 +353,7 @@ const App: React.FC = () => {
               {/* Étape 2: Options */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-sm">2</div>
                   <h3 className="text-xl font-semibold text-gray-800">Style & Finition</h3>
                 </div>
 
@@ -394,7 +394,7 @@ const App: React.FC = () => {
               {/* Étape 3: Action */}
               <div className="space-y-6">
                 <div className="flex items-center space-x-3 mb-6">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
+                  <div className="w-8 h-8 bg-gradient-to-r from-red-600 to-red-700 rounded-full flex items-center justify-center text-white font-bold text-sm">3</div>
                   <h3 className="text-xl font-semibold text-gray-800">Génération</h3>
                 </div>
 
