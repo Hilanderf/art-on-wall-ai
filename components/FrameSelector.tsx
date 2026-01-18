@@ -16,14 +16,16 @@ const FrameOption: React.FC<{
 }> = ({ value, label, selectedFrame, onFrameChange, borderColorClass }) => (
     <div
         onClick={() => onFrameChange(value)}
-        className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-            selectedFrame === value ? `${borderColorClass} bg-gray-100` : 'border-gray-300 bg-white'
+        className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] ${
+            selectedFrame === value
+                ? `${borderColorClass} bg-gradient-to-r from-red-50 to-gray-50 shadow-md shadow-red-900/10`
+                : 'border-gray-200 bg-white hover:border-red-300 hover:shadow-sm'
         }`}
     >
-        <div className={`w-6 h-6 rounded-full border-2 ${selectedFrame === value ? `${borderColorClass}` : 'border-gray-400'} flex items-center justify-center mr-4`}>
-            {selectedFrame === value && <div className="w-3 h-3 bg-red-600 rounded-full"></div>}
+        <div className={`w-6 h-6 rounded-full border-2 transition-all duration-300 ${selectedFrame === value ? `${borderColorClass}` : 'border-gray-300'} flex items-center justify-center mr-4`}>
+            {selectedFrame === value && <div className="w-3 h-3 bg-red-600 rounded-full animate-scale-in"></div>}
         </div>
-        <span className="font-medium text-gray-700">{label}</span>
+        <span className={`font-semibold transition-colors duration-300 ${selectedFrame === value ? 'text-red-700' : 'text-gray-600'}`}>{label}</span>
     </div>
 );
 
