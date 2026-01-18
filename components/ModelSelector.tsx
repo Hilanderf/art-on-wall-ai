@@ -31,19 +31,21 @@ const ModelOption: React.FC<{
 }> = ({ value, label, description, selectedModel, onModelChange }) => (
   <div
     onClick={() => onModelChange(value)}
-    className={`relative flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-      selectedModel === value ? 'border-red-600 bg-gray-100' : 'border-gray-300 bg-white'
+    className={`relative flex items-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 transform hover:scale-[1.01] active:scale-[0.99] ${
+      selectedModel === value
+        ? 'border-red-600 bg-gradient-to-r from-red-50 to-gray-50 shadow-md shadow-red-900/10'
+        : 'border-gray-200 bg-white hover:border-red-300 hover:shadow-sm'
     }`}
   >
-    <div className={`w-6 h-6 rounded-full border-2 ${selectedModel === value ? 'border-red-600' : 'border-gray-400'} flex items-center justify-center mr-4`}>
-      {selectedModel === value && <div className="w-3 h-3 bg-red-600 rounded-full"></div>}
+    <div className={`w-6 h-6 rounded-full border-2 transition-all duration-300 ${selectedModel === value ? 'border-red-600' : 'border-gray-300'} flex items-center justify-center mr-4`}>
+      {selectedModel === value && <div className="w-3 h-3 bg-red-600 rounded-full animate-scale-in"></div>}
     </div>
     <div className="flex-1">
       <div className="flex items-center gap-2">
-        <span className="font-medium text-gray-700">{label}</span>
-        <div className={`w-3 h-3 rounded-full ${getPriceColor(value)}`} title="Indicateur de prix"></div>
+        <span className={`font-semibold transition-colors duration-300 ${selectedModel === value ? 'text-red-700' : 'text-gray-600'}`}>{label}</span>
+        <div className={`w-3 h-3 rounded-full ${getPriceColor(value)} transition-transform duration-300 ${selectedModel === value ? 'scale-125' : ''}`} title="Indicateur de prix"></div>
       </div>
-      <p className="text-xs text-gray-500">{description}</p>
+      <p className={`text-xs transition-colors duration-300 ${selectedModel === value ? 'text-gray-600' : 'text-gray-400'}`}>{description}</p>
     </div>
   </div>
 );

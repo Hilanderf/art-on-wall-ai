@@ -15,12 +15,16 @@ const ArtworkTypeOption: React.FC<{
 }> = ({ value, label, icon, selectedArtworkType, onArtworkTypeChange }) => (
     <div
         onClick={() => onArtworkTypeChange(value)}
-        className={`flex flex-col items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 w-full h-32 ${
-            selectedArtworkType === value ? 'border-red-600 bg-gray-100 shadow-sm' : 'border-gray-300 bg-white hover:border-red-400'
+        className={`flex flex-col items-center justify-center p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 w-full h-32 transform hover:scale-[1.02] active:scale-[0.98] ${
+            selectedArtworkType === value
+                ? 'border-red-600 bg-gradient-to-br from-red-50 to-gray-50 shadow-lg shadow-red-900/10'
+                : 'border-gray-200 bg-white hover:border-red-300 hover:shadow-md'
         }`}
     >
-        {icon}
-        <span className="font-medium text-gray-700 mt-2">{label}</span>
+        <div className={`transition-transform duration-300 ${selectedArtworkType === value ? 'scale-110' : ''}`}>
+            {icon}
+        </div>
+        <span className={`font-semibold mt-2 transition-colors duration-300 ${selectedArtworkType === value ? 'text-red-700' : 'text-gray-600'}`}>{label}</span>
     </div>
 );
 
