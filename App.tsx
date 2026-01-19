@@ -8,8 +8,8 @@ import PedestalSelector from './components/PedestalSelector';
 import ModelSelector from './components/ModelSelector';
 import AspectRatioSelector from './components/AspectRatioSelector';
 import ResultDisplay from './components/ResultDisplay';
-import { generateArtwork, generateLastFrame, generateStatueVideo, generatePaintingVideo } from './services/falService';
-import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio } from './types';
+import { generateArtwork, generateLastFrame, generateStatueVideo, generatePaintingVideo, generateVideoWithEffect } from './services/falService';
+import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect } from './types';
 
 type ResultState = {
   imageUrl: string | null;
@@ -166,7 +166,7 @@ const App: React.FC = () => {
     }
   }, [result.sourceUrl, lastFrameUrl]);
 
-  // Handle painting animation (Wan Move - zoom + pan)
+  // Handle painting animation (Wan Move - zoom + pan) - Basic effect
   const handleAnimatePaintingClick = useCallback(async () => {
     if (!result.sourceUrl) {
       setError("Aucune image source disponible pour l'animation.");
@@ -180,6 +180,36 @@ const App: React.FC = () => {
     try {
       console.log("Generating painting animation...");
       const videoResult = await generatePaintingVideo(result.sourceUrl);
+
+      if (!videoResult.videoUrl) {
+        throw new Error("Echec de la generation de la video.");
+      }
+
+      setVideoUrl(videoResult.videoUrl);
+      setAnimationStep('done');
+
+    } catch (e: any) {
+      setError(e.message || "Une erreur est survenue lors de la generation de la video.");
+      setAnimationStep('idle');
+    } finally {
+      setIsAnimating(false);
+    }
+  }, [result.sourceUrl]);
+
+  // Handle animation with special effects (YoyoZoom, DutchAngle) using Veo 3.1
+  const handleAnimateWithEffect = useCallback(async (effect: VideoEffect) => {
+    if (!result.sourceUrl) {
+      setError("Aucune image source disponible pour l'animation.");
+      return;
+    }
+
+    setIsAnimating(true);
+    setAnimationStep('generating_video');
+    setError(null);
+
+    try {
+      console.log(`Generating animation with effect: ${effect}...`);
+      const videoResult = await generateVideoWithEffect(result.sourceUrl, effect);
 
       if (!videoResult.videoUrl) {
         throw new Error("Echec de la generation de la video.");
@@ -304,6 +334,7 @@ const App: React.FC = () => {
             isPainting={artworkType === ArtworkType.Painting}
             onAnimateClick={handleAnimateClick}
             onAnimatePaintingClick={handleAnimatePaintingClick}
+            onAnimateWithEffect={handleAnimateWithEffect}
             onConfirmLastFrame={handleConfirmLastFrame}
             onBackToImage={handleBackToImage}
             onRegenerate={handleRegenerate}
