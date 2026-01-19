@@ -1,5 +1,5 @@
 import { fal } from "@fal-ai/client";
-import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio } from '../types';
+import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect } from '../types';
 
 export interface ArtworkGenerationResult {
   imageUrl: string | null;
@@ -479,5 +479,88 @@ export const generatePaintingVideo = async (
       throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo du tableau.');
     }
     throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo du tableau.');
+  }
+};
+
+// Get the prompt for a specific video effect
+const getVideoEffectPrompt = (effect: VideoEffect): string => {
+  switch (effect) {
+    case VideoEffect.YoyoZoom:
+      return "A smooth, gentle zoom in then zoom out effect (yoyo). The camera slowly zooms into the artwork, then smoothly zooms back out. The artwork itself must remain completely static and unchanged - only the camera moves. Keep the zoom subtle and elegant.";
+    case VideoEffect.DutchAngle:
+      return "A slow, cinematic dutch angle camera movement. The camera gently tilts and rotates around the artwork creating a dramatic angle effect. The artwork itself must remain completely static and unchanged - only the camera moves. Keep the movement smooth and subtle.";
+    default:
+      return "A smooth camera movement around the artwork. The artwork must remain static.";
+  }
+};
+
+// Generate video with special effects using Veo 3.1
+// Uses the same image as both first and last frame
+export const generateVideoWithEffect = async (
+  imageUrl: string,
+  effect: VideoEffect
+): Promise<VideoGenerationResult> => {
+  try {
+    console.log(`Starting video generation with effect: ${effect}...`);
+
+    if (!FAL_API_KEY) {
+      throw new Error("FAL API Key non configurée");
+    }
+
+    fal.config({
+      credentials: FAL_API_KEY
+    });
+
+    const prompt = getVideoEffectPrompt(effect);
+
+    const input = {
+      prompt,
+      first_frame_url: imageUrl,
+      last_frame_url: imageUrl, // Same image for yoyo/dutch angle effects
+      aspect_ratio: "9:16",
+      duration: "4s",
+      resolution: "720p",
+      generate_audio: false
+    };
+
+    console.log("Calling Veo 3.1 API for video effect generation...");
+    console.log("Effect:", effect);
+    console.log("Request payload:", input);
+
+    const result = await fal.subscribe("fal-ai/veo3.1/fast/first-last-frame-to-video", {
+      input,
+      logs: true,
+      onQueueUpdate: (update) => {
+        console.log("Queue update:", update.status);
+        if (update.status === "IN_PROGRESS") {
+          update.logs?.map((log) => log.message).forEach(console.log);
+        }
+      },
+    });
+
+    console.log("Veo API response:", result);
+
+    const data = result.data as {
+      video: { url: string };
+    };
+
+    if (!data || !data.video || !data.video.url) {
+      throw new Error("Aucune vidéo n'a été générée.");
+    }
+
+    const videoUrl = data.video.url;
+    console.log("Successfully generated video with effect:", videoUrl);
+
+    return {
+      videoUrl,
+      sourceUrl: videoUrl
+    };
+
+  } catch (error) {
+    console.error("Error generating video with effect:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo.');
+    }
+    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo.');
   }
 };

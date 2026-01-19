@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import BackImageUploader from './BackImageUploader';
-import { ModelType, AspectRatio, RoomType, PedestalType, WallType } from '../types';
+import { ModelType, AspectRatio, RoomType, PedestalType, WallType, VideoEffect } from '../types';
 
 interface ResultDisplayProps {
   isLoading: boolean;
@@ -16,6 +16,7 @@ interface ResultDisplayProps {
   isPainting?: boolean;
   onAnimateClick?: (backImageFile: File) => void;
   onAnimatePaintingClick?: () => void;
+  onAnimateWithEffect?: (effect: VideoEffect) => void;
   onConfirmLastFrame?: () => void;
   onBackToImage?: () => void;
   onRegenerate?: (newModel?: ModelType, newRatio?: AspectRatio, newRoom?: RoomType, newPedestal?: PedestalType, newWall?: WallType) => void;
@@ -92,6 +93,20 @@ const wallLabels: Record<WallType, string> = {
   [WallType.Gray]: 'Gris',
 };
 
+// Video effect labels for statues
+const statueEffectLabels: Record<string, { label: string; description: string }> = {
+  [VideoEffect.Orbit]: { label: 'Orbit', description: 'Rotation 180° (necessite photo du dos)' },
+  [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
+  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
+};
+
+// Video effect labels for paintings
+const paintingEffectLabels: Record<string, { label: string; description: string }> = {
+  [VideoEffect.Basic]: { label: 'Basique', description: 'Pan lent de gauche a droite + zoom' },
+  [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
+  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
+};
+
 const ResultDisplay: React.FC<ResultDisplayProps> = ({
   isLoading,
   error,
@@ -105,6 +120,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   isPainting = false,
   onAnimateClick,
   onAnimatePaintingClick,
+  onAnimateWithEffect,
   onConfirmLastFrame,
   onBackToImage,
   onRegenerate,
@@ -127,6 +143,9 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   const [selectedRoom, setSelectedRoom] = useState<RoomType | undefined>(currentRoom);
   const [selectedPedestal, setSelectedPedestal] = useState<PedestalType | undefined>(currentPedestal);
   const [selectedWall, setSelectedWall] = useState<WallType | undefined>(currentWall);
+  const [selectedVideoEffect, setSelectedVideoEffect] = useState<VideoEffect>(
+    isStatue ? VideoEffect.Orbit : VideoEffect.Basic
+  );
 
   const handleBackImageChange = (file: File | null) => {
     setBackImageFile(file);
@@ -384,10 +403,10 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </button>
                 )}
 
-                {isPainting && onAnimatePaintingClick && (
+                {isPainting && (onAnimatePaintingClick || onAnimateWithEffect) && (
                   <button
                     type="button"
-                    onClick={onAnimatePaintingClick}
+                    onClick={() => setShowAnimationPanel(!showAnimationPanel)}
                     className="bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-lg hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center space-x-2"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -426,23 +445,137 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
                   Animer votre sculpture
                 </h3>
-                <p className="text-sm text-gray-600 mb-4 text-center">
-                  Uploadez une photo du dos de votre sculpture pour creer une animation de rotation.
-                </p>
 
-                <BackImageUploader
-                  onImageChange={handleBackImageChange}
-                  preview={backImagePreview}
-                />
+                {/* Effect selector for statues */}
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Choisissez un effet</p>
+                  <div className="space-y-2">
+                    {Object.entries(statueEffectLabels).map(([effect, { label, description }]) => (
+                      <div
+                        key={effect}
+                        onClick={() => setSelectedVideoEffect(effect as VideoEffect)}
+                        className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedVideoEffect === effect
+                            ? 'border-red-500 bg-red-50'
+                            : 'border-gray-200 bg-white hover:border-red-300'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 ${
+                          selectedVideoEffect === effect ? 'border-red-500' : 'border-gray-400'
+                        } flex items-center justify-center mr-3`}>
+                          {selectedVideoEffect === effect && (
+                            <div className="w-2.5 h-2.5 bg-red-500 rounded-full"></div>
+                          )}
+                        </div>
+                        <div>
+                          <span className={`font-medium ${
+                            selectedVideoEffect === effect ? 'text-red-800' : 'text-gray-700'
+                          }`}>
+                            {label}
+                          </span>
+                          <p className="text-xs text-gray-500">{description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
 
-                <button
-                  type="button"
-                  onClick={handleStartAnimation}
-                  disabled={!backImageFile}
-                  className="w-full mt-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Generer la last frame
-                </button>
+                {/* Show back image uploader only for Orbit effect */}
+                {selectedVideoEffect === VideoEffect.Orbit && (
+                  <>
+                    <p className="text-sm text-gray-600 mb-4 text-center">
+                      Uploadez une photo du dos de votre sculpture pour creer une animation de rotation.
+                    </p>
+                    <BackImageUploader
+                      onImageChange={handleBackImageChange}
+                      preview={backImagePreview}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleStartAnimation}
+                      disabled={!backImageFile}
+                      className="w-full mt-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Generer la last frame
+                    </button>
+                  </>
+                )}
+
+                {/* Direct video generation for YoyoZoom and DutchAngle */}
+                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle) && onAnimateWithEffect && (
+                  <button
+                    type="button"
+                    onClick={() => onAnimateWithEffect(selectedVideoEffect)}
+                    className="w-full mt-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all"
+                  >
+                    Generer la video
+                  </button>
+                )}
+              </div>
+            )}
+
+            {/* Animation Panel for Paintings */}
+            {isPainting && showAnimationPanel && (
+              <div className="w-full max-w-md bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl p-6 border border-gray-300 mt-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4 text-center">
+                  Animer votre tableau
+                </h3>
+
+                {/* Effect selector for paintings */}
+                <div className="mb-4">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Choisissez un effet</p>
+                  <div className="space-y-2">
+                    {Object.entries(paintingEffectLabels).map(([effect, { label, description }]) => (
+                      <div
+                        key={effect}
+                        onClick={() => setSelectedVideoEffect(effect as VideoEffect)}
+                        className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                          selectedVideoEffect === effect
+                            ? 'border-gray-500 bg-gray-50'
+                            : 'border-gray-200 bg-white hover:border-gray-400'
+                        }`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 ${
+                          selectedVideoEffect === effect ? 'border-gray-600' : 'border-gray-400'
+                        } flex items-center justify-center mr-3`}>
+                          {selectedVideoEffect === effect && (
+                            <div className="w-2.5 h-2.5 bg-gray-600 rounded-full"></div>
+                          )}
+                        </div>
+                        <div>
+                          <span className={`font-medium ${
+                            selectedVideoEffect === effect ? 'text-gray-800' : 'text-gray-700'
+                          }`}>
+                            {label}
+                          </span>
+                          <p className="text-xs text-gray-500">{description}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Basic effect uses Wan 2.6 */}
+                {selectedVideoEffect === VideoEffect.Basic && onAnimatePaintingClick && (
+                  <button
+                    type="button"
+                    onClick={onAnimatePaintingClick}
+                    className="w-full mt-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all"
+                  >
+                    Generer la video
+                  </button>
+                )}
+
+                {/* YoyoZoom and DutchAngle use Veo 3.1 */}
+                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle) && onAnimateWithEffect && (
+                  <button
+                    type="button"
+                    onClick={() => onAnimateWithEffect(selectedVideoEffect)}
+                    className="w-full mt-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all"
+                  >
+                    Generer la video
+                  </button>
+                )}
               </div>
             )}
 
