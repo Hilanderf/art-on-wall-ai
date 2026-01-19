@@ -488,7 +488,7 @@ const getVideoEffectPrompt = (effect: VideoEffect): string => {
     case VideoEffect.YoyoZoom:
       return "A smooth, gentle zoom in then zoom out effect (yoyo). The camera slowly zooms into the artwork, then smoothly zooms back out. The artwork itself must remain completely static and unchanged - only the camera moves. Keep the zoom subtle and elegant.";
     case VideoEffect.DutchAngle:
-      return "A slow, cinematic dutch angle camera movement. The camera gently tilts and rotates around the artwork creating a dramatic angle effect. The artwork itself must remain completely static and unchanged - only the camera moves. Keep the movement smooth and subtle.";
+      return "The camera is tilted to the side, creating a diagonal horizon effect (dutch angle). The entire frame is filmed with the camera leaning, as if the world is off-balance. This creates a stylized, edgy cinematic look. The artwork itself must remain completely static and unchanged - only the camera angle creates the tilted perspective. Keep the movement smooth and the tilt subtle but noticeable.";
     default:
       return "A smooth camera movement around the artwork. The artwork must remain static.";
   }
