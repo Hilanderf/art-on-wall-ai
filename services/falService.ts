@@ -1,6 +1,29 @@
 import { fal } from "@fal-ai/client";
 import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect } from '../types';
 
+// Extract detailed error message from FAL API errors
+const extractErrorMessage = (error: unknown, fallback: string): string => {
+  if (error instanceof Error) {
+    // FAL errors may have a body with detail
+    const falError = error as Error & { body?: { detail?: string | { msg: string }[] }; status?: number };
+    if (falError.body?.detail) {
+      if (typeof falError.body.detail === 'string') {
+        return falError.body.detail;
+      }
+      if (Array.isArray(falError.body.detail)) {
+        return falError.body.detail.map((d) => d.msg).join(', ');
+      }
+    }
+    return error.message || fallback;
+  }
+  if (typeof error === 'object' && error !== null) {
+    const obj = error as Record<string, unknown>;
+    if (typeof obj.detail === 'string') return obj.detail;
+    if (typeof obj.message === 'string') return obj.message;
+  }
+  return fallback;
+};
+
 export interface ArtworkGenerationResult {
   imageUrl: string | null;
   text: string | null;
@@ -242,10 +265,7 @@ export const generateArtwork = async (
 
   } catch (error) {
     console.error("Error processing image with FAL:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération.'));
   }
 };
 
@@ -324,10 +344,7 @@ export const generateLastFrame = async (
 
   } catch (error) {
     console.error("Error generating last frame:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la dernière frame.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération de la dernière frame.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération de la dernière frame.'));
   }
 };
 
@@ -392,10 +409,7 @@ export const generateStatueVideo = async (
 
   } catch (error) {
     console.error("Error generating video:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération de la vidéo.'));
   }
 };
 
@@ -458,10 +472,7 @@ export const generatePaintingVideo = async (
 
   } catch (error) {
     console.error("Error generating painting video:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo du tableau.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo du tableau.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération de la vidéo du tableau.'));
   }
 };
 
@@ -471,7 +482,7 @@ const getVideoEffectPrompt = (effect: VideoEffect): string => {
     case VideoEffect.YoyoZoom:
       return "A smooth, gentle zoom in then zoom out effect (yoyo). The camera slowly zooms into the artwork, then smoothly zooms back out. The artwork itself must remain completely static and unchanged - only the camera moves. Keep the zoom subtle and elegant.";
     case VideoEffect.DutchAngle:
-      return "The camera is tilted to the side, creating a diagonal horizon effect (dutch angle). The entire frame is filmed with the camera leaning, as if the world is off-balance. This creates a stylized, edgy cinematic look. The artwork itself must remain completely static and unchanged - only the camera angle creates the tilted perspective. Keep the movement smooth and the tilt subtle but noticeable.";
+      return "A slow, cinematic zoom in towards the artwork with the camera slightly tilted to the side (dutch angle). The camera gradually moves closer while maintaining a subtle diagonal tilt, creating a stylish and dynamic perspective. The artwork itself must remain completely static and unchanged - only the camera moves forward with the slight tilt. The movement is smooth and elegant.";
     default:
       return "A smooth camera movement around the artwork. The artwork must remain static.";
   }
@@ -541,10 +552,7 @@ export const generateVideoWithEffect = async (
 
   } catch (error) {
     console.error("Error generating video with effect:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération de la vidéo.'));
   }
 };
 
@@ -606,9 +614,6 @@ export const generateGrokVideo = async (
 
   } catch (error) {
     console.error("Error generating Grok video:", error);
-    if (error instanceof Error) {
-      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo Grok.');
-    }
-    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo Grok.');
+    throw new Error(extractErrorMessage(error, 'Une erreur est survenue lors de la génération de la vidéo Grok.'));
   }
 };
