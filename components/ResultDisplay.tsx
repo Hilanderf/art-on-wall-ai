@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import BackImageUploader from './BackImageUploader';
-import { ModelType, AspectRatio, RoomType, PedestalType, WallType, VideoEffect } from '../types';
+import { ModelType, AspectRatio, RoomType, PedestalType, WallType, VideoEffect, VideoEngine } from '../types';
 
 interface ResultDisplayProps {
   isLoading: boolean;
@@ -16,7 +16,7 @@ interface ResultDisplayProps {
   isPainting?: boolean;
   onAnimateClick?: (backImageFile: File) => void;
   onAnimatePaintingClick?: () => void;
-  onAnimateWithEffect?: (effect: VideoEffect) => void;
+  onAnimateWithEffect?: (effect: VideoEffect, engine: VideoEngine) => void;
   onConfirmLastFrame?: () => void;
   onBackToImage?: () => void;
   onRegenerate?: (newModel?: ModelType, newRatio?: AspectRatio, newRoom?: RoomType, newPedestal?: PedestalType, newWall?: WallType) => void;
@@ -97,16 +97,46 @@ const wallLabels: Record<WallType, string> = {
 const statueEffectLabels: Record<string, { label: string; description: string }> = {
   [VideoEffect.Orbit]: { label: 'Orbit', description: 'Rotation 180° (necessite photo du dos)' },
   [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
-  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
-  [VideoEffect.Grok]: { label: 'Grok', description: 'Video IA par xAI' },
+  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Zoom avant + camera penchee' },
 };
 
 // Video effect labels for paintings
 const paintingEffectLabels: Record<string, { label: string; description: string }> = {
   [VideoEffect.Basic]: { label: 'Basique', description: 'Pan lent de gauche a droite + zoom' },
   [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
-  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
-  [VideoEffect.Grok]: { label: 'Grok', description: 'Video IA par xAI' },
+  [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Zoom avant + camera penchee' },
+};
+
+// Video engine labels
+const engineLabels: Record<VideoEngine, { label: string; description: string }> = {
+  [VideoEngine.Veo]: { label: 'Veo 3.1', description: 'Google - First/last frame' },
+  [VideoEngine.Wan]: { label: 'Wan 2.6', description: 'Alibaba - Image to video' },
+  [VideoEngine.Grok]: { label: 'Grok', description: 'xAI - Image to video' },
+};
+
+// Available engines per effect
+const getAvailableEngines = (effect: VideoEffect): VideoEngine[] => {
+  switch (effect) {
+    case VideoEffect.Orbit:
+      return [VideoEngine.Veo]; // Only Veo supports first/last frame
+    case VideoEffect.Basic:
+      return [VideoEngine.Wan, VideoEngine.Grok];
+    case VideoEffect.YoyoZoom:
+    case VideoEffect.DutchAngle:
+      return [VideoEngine.Veo, VideoEngine.Grok];
+    default:
+      return [VideoEngine.Veo];
+  }
+};
+
+// Default engine per effect
+const getDefaultEngine = (effect: VideoEffect): VideoEngine => {
+  switch (effect) {
+    case VideoEffect.Basic:
+      return VideoEngine.Wan;
+    default:
+      return VideoEngine.Veo;
+  }
 };
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({
@@ -148,6 +178,14 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
   const [selectedVideoEffect, setSelectedVideoEffect] = useState<VideoEffect>(
     isStatue ? VideoEffect.Orbit : VideoEffect.Basic
   );
+  const [selectedVideoEngine, setSelectedVideoEngine] = useState<VideoEngine>(
+    isStatue ? VideoEngine.Veo : VideoEngine.Wan
+  );
+
+  const handleEffectChange = (effect: VideoEffect) => {
+    setSelectedVideoEffect(effect);
+    setSelectedVideoEngine(getDefaultEngine(effect));
+  };
 
   const handleBackImageChange = (file: File | null) => {
     setBackImageFile(file);
@@ -455,7 +493,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {Object.entries(statueEffectLabels).map(([effect, { label, description }]) => (
                       <div
                         key={effect}
-                        onClick={() => setSelectedVideoEffect(effect as VideoEffect)}
+                        onClick={() => handleEffectChange(effect as VideoEffect)}
                         className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
                           selectedVideoEffect === effect
                             ? 'border-red-500 bg-red-50'
@@ -482,6 +520,33 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </div>
                 </div>
 
+                {/* Engine selector - show when more than one engine available */}
+                {getAvailableEngines(selectedVideoEffect).length > 1 && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Moteur video</p>
+                    <div className="flex gap-2">
+                      {getAvailableEngines(selectedVideoEffect).map((engine) => (
+                        <div
+                          key={engine}
+                          onClick={() => setSelectedVideoEngine(engine)}
+                          className={`flex-1 flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                            selectedVideoEngine === engine
+                              ? 'border-red-500 bg-red-50'
+                              : 'border-gray-200 bg-white hover:border-red-300'
+                          }`}
+                        >
+                          <span className={`font-medium text-sm ${
+                            selectedVideoEngine === engine ? 'text-red-800' : 'text-gray-700'
+                          }`}>
+                            {engineLabels[engine].label}
+                          </span>
+                          <p className="text-xs text-gray-500">{engineLabels[engine].description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Show back image uploader only for Orbit effect */}
                 {selectedVideoEffect === VideoEffect.Orbit && (
                   <>
@@ -503,11 +568,11 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </>
                 )}
 
-                {/* Direct video generation for YoyoZoom, DutchAngle and Grok */}
-                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle || selectedVideoEffect === VideoEffect.Grok) && onAnimateWithEffect && (
+                {/* Direct video generation for YoyoZoom and DutchAngle */}
+                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle) && onAnimateWithEffect && (
                   <button
                     type="button"
-                    onClick={() => onAnimateWithEffect(selectedVideoEffect)}
+                    onClick={() => onAnimateWithEffect(selectedVideoEffect, selectedVideoEngine)}
                     className="w-full mt-4 bg-gradient-to-r from-red-600 to-red-700 text-white font-bold py-3 px-6 rounded-xl hover:from-red-700 hover:to-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all"
                   >
                     Generer la video
@@ -530,7 +595,7 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                     {Object.entries(paintingEffectLabels).map(([effect, { label, description }]) => (
                       <div
                         key={effect}
-                        onClick={() => setSelectedVideoEffect(effect as VideoEffect)}
+                        onClick={() => handleEffectChange(effect as VideoEffect)}
                         className={`flex items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
                           selectedVideoEffect === effect
                             ? 'border-gray-500 bg-gray-50'
@@ -557,22 +622,38 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </div>
                 </div>
 
-                {/* Basic effect uses Wan 2.6 */}
-                {selectedVideoEffect === VideoEffect.Basic && onAnimatePaintingClick && (
-                  <button
-                    type="button"
-                    onClick={onAnimatePaintingClick}
-                    className="w-full mt-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all"
-                  >
-                    Generer la video
-                  </button>
+                {/* Engine selector - show when more than one engine available */}
+                {getAvailableEngines(selectedVideoEffect).length > 1 && (
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-gray-700 mb-2">Moteur video</p>
+                    <div className="flex gap-2">
+                      {getAvailableEngines(selectedVideoEffect).map((engine) => (
+                        <div
+                          key={engine}
+                          onClick={() => setSelectedVideoEngine(engine)}
+                          className={`flex-1 flex flex-col items-center p-3 border-2 rounded-lg cursor-pointer transition-all ${
+                            selectedVideoEngine === engine
+                              ? 'border-gray-600 bg-gray-50'
+                              : 'border-gray-200 bg-white hover:border-gray-400'
+                          }`}
+                        >
+                          <span className={`font-medium text-sm ${
+                            selectedVideoEngine === engine ? 'text-gray-800' : 'text-gray-700'
+                          }`}>
+                            {engineLabels[engine].label}
+                          </span>
+                          <p className="text-xs text-gray-500">{engineLabels[engine].description}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
 
-                {/* YoyoZoom, DutchAngle and Grok */}
-                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle || selectedVideoEffect === VideoEffect.Grok) && onAnimateWithEffect && (
+                {/* Generate video button - all effects go through onAnimateWithEffect */}
+                {onAnimateWithEffect && (
                   <button
                     type="button"
-                    onClick={() => onAnimateWithEffect(selectedVideoEffect)}
+                    onClick={() => onAnimateWithEffect(selectedVideoEffect, selectedVideoEngine)}
                     className="w-full mt-4 bg-gradient-to-r from-gray-600 to-gray-700 text-white font-bold py-3 px-6 rounded-xl hover:from-gray-700 hover:to-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-all"
                   >
                     Generer la video
