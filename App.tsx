@@ -9,7 +9,7 @@ import ModelSelector from './components/ModelSelector';
 import AspectRatioSelector from './components/AspectRatioSelector';
 import ResultDisplay from './components/ResultDisplay';
 import { generateArtwork, generateLastFrame, generateStatueVideo, generatePaintingVideo, generateVideoWithEffect, generateGrokVideo } from './services/falService';
-import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect } from './types';
+import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect, VideoEngine } from './types';
 
 type ResultState = {
   imageUrl: string | null;
@@ -196,8 +196,8 @@ const App: React.FC = () => {
     }
   }, [result.sourceUrl]);
 
-  // Handle animation with special effects (YoyoZoom, DutchAngle) using Veo 3.1
-  const handleAnimateWithEffect = useCallback(async (effect: VideoEffect) => {
+  // Handle animation with effect + engine selection
+  const handleAnimateWithEffect = useCallback(async (effect: VideoEffect, engine: VideoEngine) => {
     if (!result.sourceUrl) {
       setError("Aucune image source disponible pour l'animation.");
       return;
@@ -208,14 +208,23 @@ const App: React.FC = () => {
     setError(null);
 
     try {
-      console.log(`Generating animation with effect: ${effect}...`);
+      console.log(`Generating animation with effect: ${effect}, engine: ${engine}...`);
       let videoResult;
-      if (effect === VideoEffect.Grok) {
-        const grokPrompt = artworkType === ArtworkType.Statue
-          ? "A smooth cinematic camera movement around this sculpture, revealing its details and textures from different angles. The movement is elegant and slow."
-          : "A smooth cinematic camera movement on this painting, slowly zooming and panning to reveal details. The painting remains static, only the camera moves.";
-        videoResult = await generateGrokVideo(result.sourceUrl, grokPrompt);
+
+      if (engine === VideoEngine.Grok) {
+        // Grok: image-to-video with effect-specific prompt
+        const grokPrompts: Record<string, string> = {
+          [VideoEffect.Basic]: "A slow, cinematic camera movement. The camera slowly pans from left to right while gently zooming in. The movement is smooth and elegant, like in a museum documentary.",
+          [VideoEffect.YoyoZoom]: "A smooth, gentle zoom in then zoom out effect. The camera slowly zooms into the artwork, then smoothly zooms back out. The movement is subtle and elegant.",
+          [VideoEffect.DutchAngle]: "A slow, cinematic zoom in towards the artwork with the camera slightly tilted to the side. The camera gradually moves closer while maintaining a subtle diagonal tilt, creating a stylish perspective.",
+        };
+        const prompt = grokPrompts[effect] || "A smooth cinematic camera movement revealing details of the artwork.";
+        videoResult = await generateGrokVideo(result.sourceUrl, prompt);
+      } else if (engine === VideoEngine.Wan) {
+        // Wan: image-to-video (used for Basic effect)
+        videoResult = await generatePaintingVideo(result.sourceUrl);
       } else {
+        // Veo: first/last frame (used for YoyoZoom, DutchAngle)
         videoResult = await generateVideoWithEffect(result.sourceUrl, effect);
       }
 

@@ -42,12 +42,17 @@ export enum AspectRatio {
 // Video effects for animations
 export enum VideoEffect {
   // For statues
-  Orbit = 'orbit',           // Current effect: rotation with first/last frame from back image
+  Orbit = 'orbit',           // Rotation with first/last frame from back image
   // For paintings
-  Basic = 'basic',           // Current effect: slow pan/zoom with Wan 2.6
-  // For both statues and paintings (using Veo 3.1 with same image as first and last frame)
+  Basic = 'basic',           // Slow pan/zoom
+  // For both statues and paintings
   YoyoZoom = 'yoyo_zoom',    // Yoyo zoom effect
-  DutchAngle = 'dutch_angle', // Dutch angle camera movement
-  // For both statues and paintings (using Grok by xAI)
-  Grok = 'grok',              // Grok video generation
+  DutchAngle = 'dutch_angle', // Zoom in with tilted camera
+}
+
+// Video generation engines
+export enum VideoEngine {
+  Veo = 'veo',     // Google Veo 3.1 (first/last frame)
+  Wan = 'wan',     // Wan 2.6 (image-to-video)
+  Grok = 'grok',   // xAI Grok Imagine Video
 }
