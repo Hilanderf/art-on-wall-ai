@@ -61,9 +61,9 @@ const ErrorDisplay: React.FC<{ message: string; onReset: () => void }> = ({ mess
 // Model labels for display
 const modelLabels: Record<ModelType, string> = {
   [ModelType.Qwen]: 'Qwen 2511',
-  [ModelType.Seedream]: 'Seedream 4.5',
+  [ModelType.QwenMax]: 'Qwen Max',
+  [ModelType.Flux2]: 'Flux 2 Pro',
   [ModelType.NanoBananaNew]: 'Nano Banana Pro',
-  [ModelType.GptImage15]: 'GPT Image 1.5',
 };
 
 // Ratio labels for display
@@ -98,6 +98,7 @@ const statueEffectLabels: Record<string, { label: string; description: string }>
   [VideoEffect.Orbit]: { label: 'Orbit', description: 'Rotation 180° (necessite photo du dos)' },
   [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
   [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
+  [VideoEffect.Grok]: { label: 'Grok', description: 'Video IA par xAI' },
 };
 
 // Video effect labels for paintings
@@ -105,6 +106,7 @@ const paintingEffectLabels: Record<string, { label: string; description: string 
   [VideoEffect.Basic]: { label: 'Basique', description: 'Pan lent de gauche a droite + zoom' },
   [VideoEffect.YoyoZoom]: { label: 'Yoyo Zoom', description: 'Zoom avant/arriere doux' },
   [VideoEffect.DutchAngle]: { label: 'Dutch Angle', description: 'Mouvement de camera cinematique' },
+  [VideoEffect.Grok]: { label: 'Grok', description: 'Video IA par xAI' },
 };
 
 const ResultDisplay: React.FC<ResultDisplayProps> = ({
@@ -501,8 +503,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </>
                 )}
 
-                {/* Direct video generation for YoyoZoom and DutchAngle */}
-                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle) && onAnimateWithEffect && (
+                {/* Direct video generation for YoyoZoom, DutchAngle and Grok */}
+                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle || selectedVideoEffect === VideoEffect.Grok) && onAnimateWithEffect && (
                   <button
                     type="button"
                     onClick={() => onAnimateWithEffect(selectedVideoEffect)}
@@ -566,8 +568,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </button>
                 )}
 
-                {/* YoyoZoom and DutchAngle use Veo 3.1 */}
-                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle) && onAnimateWithEffect && (
+                {/* YoyoZoom, DutchAngle and Grok */}
+                {(selectedVideoEffect === VideoEffect.YoyoZoom || selectedVideoEffect === VideoEffect.DutchAngle || selectedVideoEffect === VideoEffect.Grok) && onAnimateWithEffect && (
                   <button
                     type="button"
                     onClick={() => onAnimateWithEffect(selectedVideoEffect)}
@@ -623,9 +625,8 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </div>
                 </div>
 
-                {/* Ratio selector - only show if model is not GPT Image 1.5 */}
-                {selectedModel !== ModelType.GptImage15 && (
-                  <div className="mb-4">
+                {/* Ratio selector */}
+                <div className="mb-4">
                     <p className="text-sm font-medium text-amber-700 mb-2">Format de l'image</p>
                     <div className="flex gap-2">
                       {Object.values(AspectRatio).map((ratio) => (
@@ -650,13 +651,6 @@ const ResultDisplay: React.FC<ResultDisplayProps> = ({
                       ))}
                     </div>
                   </div>
-                )}
-
-                {selectedModel === ModelType.GptImage15 && (
-                  <p className="text-xs text-amber-600 mb-4 italic">
-                    GPT Image 1.5 utilise un ratio fixe.
-                  </p>
-                )}
 
                 {/* Room color selector - only show for statues */}
                 {isStatue && (
