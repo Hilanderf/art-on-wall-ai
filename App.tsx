@@ -8,7 +8,7 @@ import PedestalSelector from './components/PedestalSelector';
 import ModelSelector from './components/ModelSelector';
 import AspectRatioSelector from './components/AspectRatioSelector';
 import ResultDisplay from './components/ResultDisplay';
-import { generateArtwork, generateLastFrame, generateStatueVideo, generatePaintingVideo, generateVideoWithEffect } from './services/falService';
+import { generateArtwork, generateLastFrame, generateStatueVideo, generatePaintingVideo, generateVideoWithEffect, generateGrokVideo } from './services/falService';
 import { ArtworkType, FrameType, WallType, RoomType, PedestalType, ModelType, AspectRatio, VideoEffect } from './types';
 
 type ResultState = {
@@ -209,7 +209,15 @@ const App: React.FC = () => {
 
     try {
       console.log(`Generating animation with effect: ${effect}...`);
-      const videoResult = await generateVideoWithEffect(result.sourceUrl, effect);
+      let videoResult;
+      if (effect === VideoEffect.Grok) {
+        const grokPrompt = artworkType === ArtworkType.Statue
+          ? "A smooth cinematic camera movement around this sculpture, revealing its details and textures from different angles. The movement is elegant and slow."
+          : "A smooth cinematic camera movement on this painting, slowly zooming and panning to reveal details. The painting remains static, only the camera moves.";
+        videoResult = await generateGrokVideo(result.sourceUrl, grokPrompt);
+      } else {
+        videoResult = await generateVideoWithEffect(result.sourceUrl, effect);
+      }
 
       if (!videoResult.videoUrl) {
         throw new Error("Echec de la generation de la video.");
@@ -448,12 +456,10 @@ const App: React.FC = () => {
                   <ModelSelector selectedModel={modelType} onModelChange={setModelType} />
                 </div>
 
-                {modelType !== ModelType.GptImage15 && (
-                  <div className="bg-white/60 rounded-2xl p-6 border border-red-200 card-hover shadow-sm">
-                    <h4 className="font-medium text-gray-700 mb-4">Format de l'image</h4>
-                    <AspectRatioSelector selectedRatio={aspectRatio} onRatioChange={setAspectRatio} />
-                  </div>
-                )}
+                <div className="bg-white/60 rounded-2xl p-6 border border-red-200 card-hover shadow-sm">
+                  <h4 className="font-medium text-gray-700 mb-4">Format de l'image</h4>
+                  <AspectRatioSelector selectedRatio={aspectRatio} onRatioChange={setAspectRatio} />
+                </div>
 
                 <div className="bg-white/60 rounded-2xl p-6 border border-red-200 card-hover shadow-sm">
                   <button

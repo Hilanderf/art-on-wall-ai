@@ -76,23 +76,6 @@ const uploadImageToFal = async (imageFile: File): Promise<string> => {
   }
 };
 
-// GPT Image 1.5 only supports: auto, 1024x1024, 1536x1024, 1024x1536
-// Uses fixed 1024x1536 (2:3 portrait)
-const getImageSizeForGptImage = (): string => {
-  return '1024x1536';
-};
-
-// Seedream uses image_size with {width, height} or "auto_4K"
-// Dimensions must be between 1920-4096, total pixels between 2560*1440 and 4096*4096
-const getImageSizeForSeedream = (ratio: AspectRatio): { width: number; height: number } => {
-  if (ratio === AspectRatio.Portrait) {
-    // 9:16 ratio - portrait
-    return { width: 1920, height: 3413 }; // ~9:16
-  }
-  // 3:4 ratio
-  return { width: 2048, height: 2730 }; // ~3:4
-};
-
 // Qwen uses image_size with {width, height}
 const getImageSizeForQwen = (ratio: AspectRatio): { width: number; height: number } => {
   if (ratio === AspectRatio.Portrait) {
@@ -139,10 +122,10 @@ export const generateArtwork = async (
     let modelEndpoint: string;
     if (modelType === ModelType.NanoBananaNew) {
       modelEndpoint = "fal-ai/gemini-3-pro-image-preview/edit";
-    } else if (modelType === ModelType.GptImage15) {
-      modelEndpoint = "fal-ai/gpt-image-1.5/edit";
-    } else if (modelType === ModelType.Seedream) {
-      modelEndpoint = "fal-ai/bytedance/seedream/v4.5/edit";
+    } else if (modelType === ModelType.QwenMax) {
+      modelEndpoint = "fal-ai/qwen-image-max/edit";
+    } else if (modelType === ModelType.Flux2) {
+      modelEndpoint = "fal-ai/flux-2-pro/edit";
     } else {
       modelEndpoint = "fal-ai/qwen-image-edit-2511";
     }
@@ -160,25 +143,25 @@ export const generateArtwork = async (
         output_format: "png",
         resolution: "1K"
       };
-    } else if (modelType === ModelType.GptImage15) {
-      // GPT Image 1.5 input format - fixed ratio
+    } else if (modelType === ModelType.QwenMax) {
+      // Qwen Max input format
       input = {
         prompt: promptText,
         image_urls: [imageUrl],
         num_images: 1,
-        image_size: getImageSizeForGptImage(),
-        quality: "high",
-        input_fidelity: "high",
-        output_format: "png"
+        image_size: getImageSizeForQwen(aspectRatio),
+        output_format: "png",
+        enable_safety_checker: false
       };
-    } else if (modelType === ModelType.Seedream) {
-      // Seedream 4.5 input format
+    } else if (modelType === ModelType.Flux2) {
+      // Flux 2 Pro input format
       input = {
         prompt: promptText,
         image_urls: [imageUrl],
-        num_images: 1,
-        image_size: getImageSizeForSeedream(aspectRatio),
-        enable_safety_checker: true
+        image_size: "auto",
+        output_format: "png",
+        enable_safety_checker: false,
+        safety_tolerance: "5"
       };
     } else {
       // Qwen 2511 input format
@@ -188,7 +171,7 @@ export const generateArtwork = async (
         num_images: 1,
         image_size: getImageSizeForQwen(aspectRatio),
         output_format: "png",
-        enable_safety_checker: true
+        enable_safety_checker: false
       };
     }
 
@@ -562,5 +545,70 @@ export const generateVideoWithEffect = async (
       throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo.');
     }
     throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo.');
+  }
+};
+
+// Generate video using Grok Imagine Video by xAI
+export const generateGrokVideo = async (
+  imageUrl: string,
+  prompt: string
+): Promise<VideoGenerationResult> => {
+  try {
+    console.log("Starting video generation with Grok Imagine Video...");
+
+    if (!FAL_API_KEY) {
+      throw new Error("FAL API Key non configurée");
+    }
+
+    fal.config({
+      credentials: FAL_API_KEY
+    });
+
+    const input = {
+      prompt,
+      image_url: imageUrl,
+      duration: 6,
+      aspect_ratio: "9:16",
+      resolution: "720p"
+    };
+
+    console.log("Calling Grok Imagine Video API...");
+    console.log("Request payload:", input);
+
+    const result = await fal.subscribe("xai/grok-imagine-video/image-to-video", {
+      input,
+      logs: true,
+      onQueueUpdate: (update) => {
+        console.log("Queue update:", update.status);
+        if (update.status === "IN_PROGRESS") {
+          update.logs?.map((log) => log.message).forEach(console.log);
+        }
+      },
+    });
+
+    console.log("Grok API response:", result);
+
+    const data = result.data as {
+      video: { url: string };
+    };
+
+    if (!data || !data.video || !data.video.url) {
+      throw new Error("Aucune vidéo n'a été générée.");
+    }
+
+    const videoUrl = data.video.url;
+    console.log("Successfully generated Grok video:", videoUrl);
+
+    return {
+      videoUrl,
+      sourceUrl: videoUrl
+    };
+
+  } catch (error) {
+    console.error("Error generating Grok video:", error);
+    if (error instanceof Error) {
+      throw new Error(error.message || 'Une erreur est survenue lors de la génération de la vidéo Grok.');
+    }
+    throw new Error('Une erreur inconnue est survenue lors de la génération de la vidéo Grok.');
   }
 };

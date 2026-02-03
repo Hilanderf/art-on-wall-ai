@@ -6,16 +6,16 @@ interface ModelSelectorProps {
   onModelChange: (model: ModelType) => void;
 }
 
-// Prix: vert (cheap) -> jaune (medium) -> violet (expensive) -> rouge (very expensive)
+// Prix: vert (cheap) -> jaune (medium) -> orange (expensive) -> rouge (very expensive)
 const getPriceColor = (model: ModelType): string => {
   switch (model) {
     case ModelType.Qwen:
       return 'bg-green-500'; // Vert - le moins cher
-    case ModelType.Seedream:
+    case ModelType.QwenMax:
       return 'bg-yellow-500'; // Jaune
-    case ModelType.NanoBananaNew:
+    case ModelType.Flux2:
       return 'bg-orange-500'; // Orange
-    case ModelType.GptImage15:
+    case ModelType.NanoBananaNew:
       return 'bg-red-500'; // Rouge - le plus cher
     default:
       return 'bg-gray-500';
@@ -61,9 +61,16 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
         onModelChange={onModelChange}
       />
       <ModelOption
-        value={ModelType.Seedream}
-        label="Seedream 4.5"
-        description="ByteDance - Stylized & transform"
+        value={ModelType.QwenMax}
+        label="Qwen Max"
+        description="Alibaba - Higher quality editing"
+        selectedModel={selectedModel}
+        onModelChange={onModelChange}
+      />
+      <ModelOption
+        value={ModelType.Flux2}
+        label="Flux 2 Pro"
+        description="Black Forest Labs - High fidelity editing"
         selectedModel={selectedModel}
         onModelChange={onModelChange}
       />
@@ -71,13 +78,6 @@ const ModelSelector: React.FC<ModelSelectorProps> = ({ selectedModel, onModelCha
         value={ModelType.NanoBananaNew}
         label="Nano Banana Pro"
         description="Gemini 3 Pro - Realism & typography"
-        selectedModel={selectedModel}
-        onModelChange={onModelChange}
-      />
-      <ModelOption
-        value={ModelType.GptImage15}
-        label="GPT Image 1.5"
-        description="High fidelity (ratio fixe)"
         selectedModel={selectedModel}
         onModelChange={onModelChange}
       />

@@ -29,8 +29,8 @@ export enum ArtworkType {
 
 export enum ModelType {
   NanoBananaNew = 'nano_banana_new',
-  GptImage15 = 'gpt_image_15',
-  Seedream = 'seedream',
+  QwenMax = 'qwen_max',
+  Flux2 = 'flux_2',
   Qwen = 'qwen',
 }
 
@@ -48,4 +48,6 @@ export enum VideoEffect {
   // For both statues and paintings (using Veo 3.1 with same image as first and last frame)
   YoyoZoom = 'yoyo_zoom',    // Yoyo zoom effect
   DutchAngle = 'dutch_angle', // Dutch angle camera movement
+  // For both statues and paintings (using Grok by xAI)
+  Grok = 'grok',              // Grok video generation
 }
